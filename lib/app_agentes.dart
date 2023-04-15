@@ -230,12 +230,12 @@ class AppAgentesState extends State<AppAgentes> {
   void printLanguages() async {
     flutterTts.setSpeechRate(0.53);
     List<dynamic> languages = await flutterTts.getLanguages;
-    List<dynamic> engines = await flutterTts.getEngines;
+    //List<dynamic> engines = await flutterTts.getEngines;
     print("Lenguajes soportados:");
     print(languages.toString());
-     print("engines soportados:");
-     print(engines.toString());
-     flutterTts.setLanguage("es-ES");
+    // print("engines soportados:");
+    // print(engines.toString());
+    flutterTts.setLanguage("es-MX");
     //printVoices();
   }
   void printVoices() async {
