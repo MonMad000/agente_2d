@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:rive/rive.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:testeo/funciones.dart';
 import 'package:testeo/tools/globales.dart';
+import 'package:testeo/tools/openai_services.dart';
 
 
 // Esta es la clase que representa el widget de la aplicación
@@ -88,6 +90,7 @@ class AppAgentesState extends State<AppAgentes> {
       //es una interfaz prediseñada estilo material design
       title: 'Material App',
       home: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('Agente 2D - Visemas y expresiones'),
         ),
@@ -130,10 +133,25 @@ class AppAgentesState extends State<AppAgentes> {
                 _buildEmotionButton('😐', 0),
                 FloatingActionButton(
                   onPressed: () {
-                    pressHablar();
+                    pressHablar(texto);
                   },
                   child: Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
                 ),
+                FloatingActionButton(
+                  onPressed: () async {
+
+                    var res = await sendTextCompletionRequest(texto);
+                    print("res:"+res.toString());
+                    response =res["choices"][0]["text"];
+                    print("response:"+response);
+                    String textoDecodificado = utf8.decode(response.codeUnits);
+                    print(textoDecodificado);
+                    pressHablar(textoDecodificado);
+
+                  },
+                  child: Text('\u{1F5E8}', style: TextStyle(fontSize: 30)),
+                )
+
               ],
             ),
           ),
@@ -174,8 +192,9 @@ class AppAgentesState extends State<AppAgentes> {
 
   //################# FUNCIONES ACTUALIZAN ESTADO###################
 
-  pressHablar() {
+  pressHablar(String texto) {
     //se acomoda el texto para poder convertirlo a visemas
+    texto=remplazarNumerosEnPalabras(texto);
     texto = limpiaTexto(texto);
 
     textoDividido = splitPorPunto(texto);
@@ -199,7 +218,7 @@ class AppAgentesState extends State<AppAgentes> {
       await flutterTts.stop();
     }
   }
-
+// se actualiza el texto q se esta ingresando
   void _onChange(String text) {
     setState(() {
       texto = text;

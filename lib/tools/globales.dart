@@ -5,6 +5,7 @@ import 'package:rive/rive.dart';
 FlutterTts flutterTts = FlutterTts(); //texto a voz
 String texto = "";
 TextEditingController textController = TextEditingController();
+String response ="";
 List<String> textoDividido = [];
 SMIInput<double>? visemaNum;
 SMIInput<double>? miradaNum;
