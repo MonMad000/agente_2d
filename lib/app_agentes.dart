@@ -67,10 +67,15 @@ class AppAgentesState extends State<AppAgentes> {
           gestoNum = controller.findInput('gesto');
           gestoNum?.value = 0;
 
-          Timer.periodic(const Duration(seconds: 5), (timer) {
+          Timer.periodic(const Duration(seconds: 2), (timer) {
             setState(() {
-              int randomNumber = Random().nextInt(5);
-              miradaNum?.value = randomNumber.toDouble();
+              int randomNumber = Random().nextInt(6);
+
+              miradaNum?.value = hablando ? 0: randomNumber.toDouble();
+              // Future.delayed(Duration(seconds: 3), () {
+              //   miradaNum?.value = 0;
+              // });
+              print(miradaNum?.value);
             });
           });
         }
@@ -133,6 +138,8 @@ class AppAgentesState extends State<AppAgentes> {
                 _buildEmotionButton('😐', 0),
                 FloatingActionButton(
                   onPressed: () {
+                    print(convertToSSML("No me priven de la vida, de la muerte no me hablen, ni, hoy ni más tarde y entre todos o nadie ¡Adios!"));
+                    print(convertToSSML("Hola, soy un texto de prueba. Quiero probar la función de conversión a SSML. Esta función debería agregar un break después de cada signo de puntuación, y después de ciertas palabras. Por ejemplo, debería agregar un break después de las palabras pero, sin embargo, por otro lado, ahora, anteriormente, después, entonces, inmediatamente, luego, más tarde, pronto, en conclusión, por consiguiente, en resumen, por último. Pero no debería agregar breaks consecutivos. Vamos a ver cómo funciona."));
                     pressHablar(texto);
                   },
                   child: Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
@@ -173,6 +180,7 @@ class AppAgentesState extends State<AppAgentes> {
         ),
         onPressed: () {
           setState(() {
+
             printLanguages();
             selectedEmotion = value;
             gestoNum?.value = selectedEmotion.toDouble();
@@ -215,7 +223,9 @@ class AppAgentesState extends State<AppAgentes> {
     if (C.isNotEmpty) {
       await flutterTts.awaitSpeakCompletion(true);
       await flutterTts.speak(C);
+
       await flutterTts.stop();
+      hablando=false;
     }
   }
 // se actualiza el texto q se esta ingresando
@@ -226,6 +236,7 @@ class AppAgentesState extends State<AppAgentes> {
   }
 
   void recorrerTexto(String texto) async {
+    RegExp regExp = RegExp(r'[;:?!]');
     print("EL TEXTO LIMPIO QUEDA: " + texto);
     //se recorre el texto para pasar de caracter a visema
 
@@ -239,6 +250,11 @@ class AppAgentesState extends State<AppAgentes> {
       if (texto[i] == ',') {
         //flutterTts.pause();
         await Future.delayed(const Duration(milliseconds: 750));
+        //await flutterTts.speak(texto.substring(i));
+      }
+      if (regExp.hasMatch(texto[i])) {
+        //flutterTts.pause();
+        await Future.delayed(const Duration(milliseconds: 850));
         //await flutterTts.speak(texto.substring(i));
       }
       await Future.delayed(Duration(milliseconds: esperaVisemas), () {

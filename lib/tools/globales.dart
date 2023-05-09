@@ -13,6 +13,7 @@ SMIInput<double>? gestoNum;
 int selectedEmotion = 0;
 int esperaVisemas = 0;
 Artboard? riveArtboard;
+bool hablando=false;
 
 String ejemploAbc =
     ". a. be. ce. de. efe. ge. hache. i. jota. ka. ele. eme. ene. eñe. o. pe. ku. erre. ese. te. u. ve. doble ve. equis. y griega. zeta.";
