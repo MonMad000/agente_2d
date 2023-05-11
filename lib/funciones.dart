@@ -271,6 +271,19 @@ String convertToSSML(String text) {
   // Devuelve la cadena SSML
   return ssml;
 }
+String toSSML(String text) {
+  // Define la expresión regular para los breaks después de las comas
+  RegExp exp = RegExp(r'\b\w+\b,\s');
+
+  // Reemplaza las coincidencias de la expresión regular con ellas mismas seguidas de un break
+  String ssmlText = text.replaceAllMapped(exp, (match) => '${match.group(0)}<break time="3s"/>');
+
+  // Agrega las etiquetas de inicio y final de speak
+  String ssml = '<speak>' + ssmlText + '</speak>';
+
+  // Devuelve la cadena SSML
+  return ssml;
+}
 
 
 
