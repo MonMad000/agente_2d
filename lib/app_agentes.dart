@@ -136,13 +136,14 @@ class AppAgentesState extends State<AppAgentes> {
                 _buildEmotionButton('😊', -1),
                 _buildEmotionButton('😢', -2),
                 _buildEmotionButton('😐', 0),
-                FloatingActionButton(
+                FloatingActionButton( //HABLAR
                   onPressed: () {
+                    flutterTts.getEngines;
                     pressHablar(texto);
                   },
                   child: Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
                 ),
-                FloatingActionButton(
+                FloatingActionButton(//  INTERACTUAR
                   onPressed: () async {
 
                     var res = await sendTextCompletionRequest(texto);
@@ -155,17 +156,7 @@ class AppAgentesState extends State<AppAgentes> {
 
                   },
                   child: Text('\u{1F5E8}', style: TextStyle(fontSize: 30)),
-                ),
-                FloatingActionButton(
-                  onPressed: () async {
-                    //print(convertToSSML("No me priven de la vida, de la muerte no me hablen, ni, hoy ni más tarde y entre todos o nadie ¡Adios!"));
-                    //print(convertToSSML("Hola, soy un texto de prueba. Quiero probar la función de conversión a SSML. Esta función debería agregar un break después de cada signo de puntuación, y después de ciertas palabras. Por ejemplo, debería agregar un break después de las palabras pero, sin embargo, por otro lado, ahora, anteriormente, después, entonces, inmediatamente, luego, más tarde, pronto, en conclusión, por consiguiente, en resumen, por último. Pero no debería agregar breaks consecutivos. Vamos a ver cómo funciona."));
-                    print( toSSML("hola, dos de choclo, cuatro de choclo, 5 de choclo"));
-                    pressHablar(toSSML("ahora esperaré 3 segundos, ya pasaron 3 segundos"));
-                  },
-                  child: Text('SSML', style: TextStyle(fontSize: 12)),
                 )
-
               ],
             ),
           ),
