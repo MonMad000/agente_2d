@@ -12,14 +12,14 @@ class _MiAplicacionState extends State<MiAplicacion> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mi Aplicacion',
+      title: 'cargar texto',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: Text('Mi Aplicacion'),
+            title: Text('Cargar texto'),
           ),
           endDrawer: MediaQuery.of(context).size.width < 600 ? _buildDrawer(context) : null,
           body: LayoutBuilder(
