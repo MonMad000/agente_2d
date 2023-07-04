@@ -253,37 +253,8 @@ String remplazarNumerosEnPalabras(String texto) {
 }
 
 
-String convertToSSML(String text) {
-  // Define las expresiones regulares para los breaks
-  RegExp exp1 = RegExp(r'\b\w+\b([,.?!;]\s+|$)');
-  RegExp exp2 = RegExp(r'\b(y|o|u|e|ni|pero|sin embargo|por otro lado|ahora|anteriormente|después|entonces|inmediatamente|luego|más tarde|pronto|en conclusión|por consiguiente|en resumen|por último)\b\s');
 
-  // Reemplaza las coincidencias de las expresiones regulares con ellas mismas seguidas de un break
-  String ssmlText = text.replaceAllMapped(exp1, (match) => '${match.group(0)}<break time="1s"/>');
-  ssmlText = ssmlText.replaceAllMapped(exp2, (match) => '${match.group(0)}<break time="1s"/>');
 
-  // Elimina los breaks consecutivos
-  ssmlText = ssmlText.replaceAll('<break time="1s"/><break time="1s"/>', '<break time="1s"/>');
-
-  // Agrega las etiquetas de inicio y final de speak
-  String ssml = '<speak>' + ssmlText + '</speak>';
-
-  // Devuelve la cadena SSML
-  return ssml;
-}
-String toSSML(String text) {
-  // Define la expresión regular para los breaks después de las comas
-  RegExp exp = RegExp(r'\b\w+\b,\s');
-
-  // Reemplaza las coincidencias de la expresión regular con ellas mismas seguidas de un break
-  String ssmlText = text.replaceAllMapped(exp, (match) => '${match.group(0)}<break time="3s"/>');
-
-  // Agrega las etiquetas de inicio y final de speak
-  String ssml = '<speak>' + ssmlText + '</speak>';
-
-  // Devuelve la cadena SSML
-  return ssml;
-}
 
 
 
