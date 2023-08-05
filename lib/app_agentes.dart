@@ -133,26 +133,24 @@ class AppAgentesState extends State<AppAgentes> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               //String emoji = '\u{1F60A}';
               children: [
-                _buildEmotionButton('😊', -1),
-                _buildEmotionButton('😢', -2),
-                _buildEmotionButton('😐', 0),
                 FloatingActionButton( //HABLAR
                   onPressed: () {
                     flutterTts.getEngines;
-                    pressHablar(texto);
+                    print("aprete el boton de hablar");
+                    hablaSSML(texto);
                   },
                   child: Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
                 ),
                 FloatingActionButton(//  INTERACTUAR
                   onPressed: () async {
-                    hablaSSML(texto);
-                    // var res = await sendTextCompletionRequest(texto);
-                    // print("res:"+res.toString());
-                    // response =res["choices"][0]["text"];
-                    // print("response:"+response);
-                    // String textoDecodificado = utf8.decode(response.codeUnits);
-                    // print(textoDecodificado);
-                    // pressHablar(textoDecodificado);
+
+                    var res = await sendTextCompletionRequest(texto);
+                    print("res:"+res.toString());
+                    response =res["choices"][0]["text"];
+                    print("response:"+response);
+                    String textoDecodificado = utf8.decode(response.codeUnits);
+                    print(textoDecodificado);
+                    pressHablar(textoDecodificado);
 
                   },
                   child: Text('\u{1F5E8}', style: TextStyle(fontSize: 30)),
@@ -221,8 +219,6 @@ class AppAgentesState extends State<AppAgentes> {
     if (C.isNotEmpty) {
       await flutterTts.awaitSpeakCompletion(true);
       await flutterTts.speak(C);
-
-      await flutterTts.stop();
       hablando=false;
     }
   }
@@ -260,6 +256,7 @@ class AppAgentesState extends State<AppAgentes> {
       });
     }
   }
+  //
   void recorrerTextoSSML(String texto) async {
     print("EL TEXTO LIMPIO QUEDA: " + texto);
     //se recorre el texto para pasar de caracter a visema
@@ -321,12 +318,17 @@ class AppAgentesState extends State<AppAgentes> {
     }
   }
   Future<void> hablaSSML(String txt) async {
+    print("entre a funcion hablaSSML");
     txt = remplazarNumerosEnPalabras(txt);
+    print("reemplace numeros por letras");
     String txtSSML = convertToSSML(txt); //se prepara el texto para el tts
+    print("despues de convertToSSML");
     String txtLimpio = limpiaTexto(txt); //se prepara el texto para el ttv (text to visem)
+    print("despues de limpiaTexto");
     recorrerTextoSSML(txtLimpio);
+    print("despues de recorrerTextoSSML");
     await flutterTts.setLanguage('es-MX'); // Establece el idioma
-    await flutterTts.setSpeechRate(0.4); // Establece la velocidad del habla
+    await flutterTts.setSpeechRate(0.46); // Establece la velocidad del habla
     await flutterTts.setVolume(1); // Establece el volumen
     habla(txtSSML);
   }
