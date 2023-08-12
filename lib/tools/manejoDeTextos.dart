@@ -1,6 +1,6 @@
 String convertToSSML(String text) {
   // Definir la expresión regular para los signos de puntuación que agregarán pausas
-  final punctuationRegex = RegExp(r'[\.,;?!:-]|\n');
+  final punctuationRegex = RegExp(r'[.,;?!:\-\n]');
 
   // Definir la duración de las pausas para cada tipo de signo de puntuación
   final pauseDurations = {
@@ -10,15 +10,15 @@ String convertToSSML(String text) {
     '?': '800ms',
     '!': '800ms',
     ':': '400ms',
-    '-': '200ms', // Agregado: pausa para el guión
-    //'\n': '1000ms' // Agregado: pausa para el salto de línea
+    '-': '200ms',
+    '\n': '500ms'
   };
 
   // Reemplazar signos de puntuación y saltos de línea con SSML que incluye pausas
   String ssmlText = text.replaceAllMapped(punctuationRegex, (match) {
     final punctuation = match.group(0);
     final pauseDuration = pauseDurations[punctuation] ?? '500ms';
-    return '<break time="$pauseDuration"/>';
+    return '$punctuation<break time="$pauseDuration"/>';
   });
 
   // Envolver el texto en la etiqueta <speak> si no está vacío
@@ -42,7 +42,7 @@ enum Emocion {
 
 Map<Emocion, List<String>> palabrasClave = {
   Emocion.Felicidad: [
-    'feliz', 'alegre', 'bueno', 'maravilloso', 'amor', 'divertido', 'éxito',
+    '¿','feliz', 'alegre', 'bueno', 'maravilloso', 'amor', 'divertido', 'éxito',
     'sonrisa', 'agradable', 'positivo', 'contento', 'optimismo', 'gratitud',
     'festejar', 'alegrarse', 'emocionante', 'satisfactorio', 'entusiasmado', 'alegremente',
     'hola',  'buenas','gracias', 'amistad', 'ayuda', 'amo', 'extraño', 'deseo', 'gusto', 'encantado', 'bienvenido',

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,24 +9,26 @@ import 'package:testeo/funciones.dart';
 import 'package:testeo/tools/globales.dart';
 import 'package:testeo/tools/manejoDeTextos.dart';
 import 'package:testeo/tools/openai_services.dart';
-
+import 'package:statsfl/statsfl.dart';
 
 // Esta es la clase que representa el widget de la aplicación
 class AppAgentes extends StatefulWidget {
- // const AppAgentes({super.key});
+  // const AppAgentes({super.key});
   const AppAgentes({Key? key}) : super(key: key);
+
   @override
   AppAgentesState createState() => AppAgentesState();
 }
+
 // Esta es la clase de estado correspondiente al StatefulWidget
 class AppAgentesState extends State<AppAgentes> {
-
   @override
   // Este método se llama cada vez que se actualiza el estado de la aplicación.
   Widget build(BuildContext context) {
     // Devuelve una instancia de MaterialApp, que es la raíz de la interfaz de usuario.
     return gui(context);
   }
+
   //############### FUNCIONES DE INICIALIZACION##############
   @override
   void initState() {
@@ -35,19 +36,22 @@ class AppAgentesState extends State<AppAgentes> {
     texto = "";
     super.initState();
     initTts();
-    initRive();
+    initRive(riv);
   }
+
   initTts() async {
     //inicializa el flutterTts, controlador del texto a voz
     flutterTts = FlutterTts();
-    flutterTts.setSpeechRate(0.53); //0.53
-
-
+    await flutterTts.setLanguage('es-MX'); // Establece el idioma
+    await flutterTts
+        .setSpeechRate(0.46); //0.53 Establece la velocidad del habla
+    await flutterTts.setVolume(1); // Establece el volumen
   }
-  initRive() {
-    //rootBundle.load('assets/ella.riv').then(
-    rootBundle.load('assets/primerExpresiones.riv').then(
-          (data) async {
+
+  initRive(String riv) {
+    //rootBundle.load('assets/ella1.riv').then(
+    rootBundle.load('assets/$riv.riv').then(
+      (data) async {
         // se guarda en la variable file
         final file = RiveFile.import(data);
         //se guarda el artboard del archivo
@@ -67,17 +71,17 @@ class AppAgentesState extends State<AppAgentes> {
           miradaNum = controller.findInput('mirada');
           miradaNum?.value = -1;
 
-          Timer.periodic(const Duration(seconds: 2), (timer) {
-            setState(() {
-              int randomNumber = Random().nextInt(6);
+          /*Timer.periodic(const Duration(seconds: 5), (timer) {
 
-              //miradaNum?.value = hablando ? 0: randomNumber.toDouble();
-              // Future.delayed(Duration(seconds: 3), () {
-              //   miradaNum?.value = 0;
-              // });
-              //print(miradaNum?.value);
+            setState(() {
+              print('parpadea');
+              miradaNum?.value = 5;
+              print(miradaNum?.value);
             });
-          });
+            Future.delayed(Duration(seconds: 4), () {
+               miradaNum?.value = 0;
+            });
+          });*/
         }
 
         setState(() => riveArtboard = artboard);
@@ -85,94 +89,120 @@ class AppAgentesState extends State<AppAgentes> {
     );
   }
 
-
-
   //############### FUNCIONES DE INTERFAZ##############
 
   Widget gui(BuildContext context) {
     //esta funcion devuelve el widget raiz y por ende la interfaz
-    return MaterialApp(
-      //es una interfaz prediseñada estilo material design
-      title: 'Material App',
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('Agente 2D - Visemas y expresiones'),
+    return StatsFl(
+      align: Alignment.bottomRight,
+      child: MaterialApp(
+        //es una interfaz prediseñada estilo material design
+        title: 'Material App',
+        home: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text('Agente 2D - Visemas y expresiones'),
+          ),
+          body: Column(children: [
+            Expanded(
+              //la cara
+              flex: 7,
+              child: SizedBox(
+                  width: 500,
+                  height: 500,
+                  child: Rive(
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      artboard: riveArtboard!)),
+            ),
+            Expanded(
+              //el texto
+              flex: 2,
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                child: TextField(
+                    onChanged: (String value) {
+                      _onChange(value);
+                    },
+                    maxLines: null,
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Ingrese el texto deseado',
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    )),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //String emoji = '\u{1F60A}';
+                children: [
+                  FloatingActionButton(
+                    //cambio cara
+                    onPressed: () {
+                      if(cara<2)
+                        cara++;
+                      else cara = 0;
+                      switch (cara) {
+                        case 0:
+                          riv = 'ella1';
+                          break;
+                        case 1:
+                          riv = 'rubia';
+                          break;
+                        case 2:
+                          riv = 'nene';
+                          break;
+                      }
+                      initRive(riv);
+                    },
+                    child:
+                        const Text('\u{1F5FF}', style: TextStyle(fontSize: 30)),
+                  ),
+                  FloatingActionButton(
+                    //HABLAR
+                    onPressed: () {
+                      flutterTts.getEngines;
+                      hablaSSML(texto);
+                    },
+                    child:
+                        const Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
+                  ),
+                  /*FloatingActionButton(//  INTERACTUAR
+                    onPressed: () async {
+
+                      var res = await sendTextCompletionRequest(texto);
+                      print("res:"+res.toString());
+                      response =res["choices"][0]["text"];
+                      print("response:"+response);
+                      String textoDecodificado = utf8.decode(response.codeUnits);
+                      print(textoDecodificado);
+                      pressHablar(textoDecodificado);
+
+                    },
+                    child: Text('\u{1F5E8}', style: TextStyle(fontSize: 30)),
+                  )*/
+                ],
+              ),
+            ),
+          ]),
         ),
-        body: Column(children: [
-          Expanded(
-            flex: 7,
-            child: Container(
-                width: 500,
-                height: 500,
-                child: Rive(
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    artboard: riveArtboard!)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              child: TextField(
-                  onChanged: (String value) {
-                    _onChange(value);
-                  },
-                  maxLines: null,
-                  controller: textController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Ingrese el texto deseado',
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
-                  )),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //String emoji = '\u{1F60A}';
-              children: [
-                FloatingActionButton( //HABLAR
-                  onPressed: () {
-                    flutterTts.getEngines;
-                    print("aprete el boton de hablar");
-                    hablaSSML(texto);
-                  },
-                  child: Text('\u{1F5E3}', style: TextStyle(fontSize: 30)),
-                ),
-                FloatingActionButton(//  INTERACTUAR
-                  onPressed: () async {
-
-                    var res = await sendTextCompletionRequest(texto);
-                    print("res:"+res.toString());
-                    response =res["choices"][0]["text"];
-                    print("response:"+response);
-                    String textoDecodificado = utf8.decode(response.codeUnits);
-                    print(textoDecodificado);
-                    pressHablar(textoDecodificado);
-
-                  },
-                  child: Text('\u{1F5E8}', style: TextStyle(fontSize: 30)),
-                )
-              ],
-            ),
-          ),
-        ]),
       ),
     );
   }
 
-  Widget _buildEmotionButton(String emoji, int value) {
+  /*Widget _buildEmotionButton(String emoji, int value) {
     return SizedBox(
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(70, 70),
-          shape: CircleBorder(),
+          minimumSize: const Size(70, 70),
+          shape: const CircleBorder(),
           elevation: selectedEmotion == value ? 8 : 2,
           backgroundColor: selectedEmotion == value
               ? Colors.blue
-              : Color.fromARGB(181, 150, 255, 194),
+              : const Color.fromARGB(181, 150, 255, 194),
         ),
         onPressed: () {
           setState(() {
@@ -193,14 +223,13 @@ class AppAgentesState extends State<AppAgentes> {
       ),
     );
   }
-
-  //################# FUNCIONES ACTUALIZAN ESTADO###################
+*/
+  //################# FUNCIONES QUE ACTUALIZAN ESTADO###################
 
   pressHablar(String texto) {
     //se acomoda el texto para poder convertirlo a visemas
     //texto=remplazarNumerosEnPalabras(texto);
     texto = limpiaTexto(texto);
-
     textoDividido = splitPorPunto(texto);
     for (int j = 0; j < textoDividido.length; j++) {
       print(textoDividido[j]);
@@ -216,22 +245,26 @@ class AppAgentesState extends State<AppAgentes> {
   }
 
   Future<void> habla(String C) async {
+    await flutterTts.awaitSpeakCompletion(true);
     if (C.isNotEmpty) {
-      await flutterTts.awaitSpeakCompletion(true);
       await flutterTts.speak(C);
-      hablando=false;
+      await flutterTts.awaitSpeakCompletion(true);
+      hablando = false;
+      await Future.delayed(const Duration(milliseconds: 1000));
+      visemaNum?.value = -1;
     }
   }
-// se actualiza el texto q se esta ingresando
+
+// se actualiza el texto q se esta ingresando, se invoca cuando el campo de texto cambia
   void _onChange(String text) {
     setState(() {
       texto = text;
     });
   }
+
 //hace que mueva la boca basicamente
   void recorrerTexto(String texto) async {
     RegExp regExp = RegExp(r'[;:?!]');
-    print("EL TEXTO LIMPIO QUEDA: " + texto);
     //se recorre el texto para pasar de caracter a visema
 
     for (int i = 0; i < texto.length; i++) {
@@ -252,15 +285,19 @@ class AppAgentesState extends State<AppAgentes> {
         //await flutterTts.speak(texto.substring(i));
       }
       await Future.delayed(Duration(milliseconds: esperaVisemas), () {
-        visemaNum?.value = charToVisema(texto[i]).toDouble();
+        if(cara!=2){
+          visemaNum?.value = charToVisema(texto[i]).toDouble();
+
+        }
+        else visemaNum?.value = charToVisemaGenerico(texto[i]).toDouble();
+
       });
     }
   }
+
   //
   void recorrerTextoSSML(String texto) async {
-    print("EL TEXTO LIMPIO QUEDA: " + texto);
     //se recorre el texto para pasar de caracter a visema
-
     for (int i = 0; i < texto.length; i++) {
       //este if controla que si es el primer caracter no espere
       if (i == 0) {
@@ -287,9 +324,9 @@ class AppAgentesState extends State<AppAgentes> {
         case ':':
           await Future.delayed(const Duration(milliseconds: 400));
           break;
-        // case '\n': // Nueva línea
-        //   await Future.delayed(const Duration(milliseconds: 500));
-        //   break;
+        case '\n': // Nueva línea
+          await Future.delayed(const Duration(milliseconds: 500));
+          break;
         case '-': // Guion
           await Future.delayed(const Duration(milliseconds: 200));
           break;
@@ -298,56 +335,57 @@ class AppAgentesState extends State<AppAgentes> {
         visemaNum?.value = charToVisema(texto[i]).toDouble();
       });
       //recorro la cadena entre signos de puntuacion
-      if (texto[i] == '.' || texto[i] == ',' || texto[i] == ';' ||
-          texto[i] == '?' || texto[i] == '!' || texto[i] == ':' || i == 0) {
+      if (texto[i] == '.' ||
+          texto[i] == ',' ||
+          texto[i] == ';' ||
+          texto[i] == '?' ||
+          texto[i] == '!' ||
+          texto[i] == ':' ||
+          i == 0) {
         // Detectar el próximo texto hasta el siguiente signo de puntuación
         String proximoTexto = '';
         for (int j = i + 1; j < texto.length; j++) {
-          if (texto[j] == '.' || texto[j] == ',' || texto[j] == ';' ||
-              texto[j] == '?' || texto[j] == '!' || texto[j] == ':') {
+          if (texto[j] == '.' ||
+              texto[j] == ',' ||
+              texto[j] == ';' ||
+              texto[j] == '?' ||
+              texto[j] == '!' ||
+              texto[j] == ':') {
             break;
           }
           proximoTexto += texto[j];
         }
-        Emocion emocionProximoTexto = analizarSentimiento(proximoTexto.trim());
-        gestoNum?.value = asignarValorEmocion(emocionProximoTexto);
-        print("miradaNum?.value"+miradaNum!.value.toString());
-        print('Próximo Texto: $proximoTexto');
-        print('Emoción del Próximo Texto: $emocionProximoTexto');
+        if (proximoTexto.isNotEmpty) {
+          Emocion emocionProximoTexto =
+              analizarSentimiento(proximoTexto.trim());
+          gestoNum?.value = asignarValorEmocion(emocionProximoTexto);
+        }
       }
     }
   }
+
   Future<void> hablaSSML(String txt) async {
-    print("entre a funcion hablaSSML");
     txt = remplazarNumerosEnPalabras(txt);
-    print("reemplace numeros por letras");
     String txtSSML = convertToSSML(txt); //se prepara el texto para el tts
-    print("despues de convertToSSML");
-    String txtLimpio = limpiaTexto(txt); //se prepara el texto para el ttv (text to visem)
-    print("despues de limpiaTexto");
+    String txtLimpio =
+        limpiaTexto(txt); //se prepara el texto para el ttv (text to visem)
     recorrerTextoSSML(txtLimpio);
-    print("despues de recorrerTextoSSML");
-    await flutterTts.setLanguage('es-MX'); // Establece el idioma
-    await flutterTts.setSpeechRate(0.46); // Establece la velocidad del habla
-    await flutterTts.setVolume(1); // Establece el volumen
     habla(txtSSML);
   }
+
+  //################# FUNCIONES AUXILIARES TTS  ###################
   void printLanguages() async {
-    flutterTts.setSpeechRate(1);
     List<dynamic> languages = await flutterTts.getLanguages;
-    //List<dynamic> engines = await flutterTts.getEngines;
     print("Lenguajes soportados:");
     print(languages.toString());
-    // print("engines soportados:");
-    // print(engines.toString());
-    flutterTts.setLanguage("es-MX");
-    //printVoices();
   }
+
   void printVoices() async {
     List<dynamic> voices = await flutterTts.getVoices;
     print("Voces disponibles:");
     for (dynamic voice in voices) {
-      print(" - ${voice['name']}, ${voice['language']}, ${voice['quality']}, ${voice['phonetics']}");
+      print(
+          " - ${voice['name']}, ${voice['language']}, ${voice['quality']}, ${voice['phonetics']}");
     }
   }
 }

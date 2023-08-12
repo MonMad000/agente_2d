@@ -45,10 +45,7 @@ String limpiaTexto(String texto) {
       if (texto[i - 1] == 'y' && texto[i] == '') {
         texto = replaceCharAt(texto, i - 1, 'i');
       }
-      //cambiar , por ¬
-      if (texto[i] == ',') {
-        //texto = replaceCharAt(texto, i, '¬');
-      }
+
     }
   }
   return texto;
@@ -101,12 +98,16 @@ int charToVisemaGenerico(String C) {
     case ".":
     case "\n":
       return -2;
-    case ",":
+    case ".":
     case ";":
+    case "-":
+    case "?":
+    case "!":
+    case ",":
     case ":":
-      return -1;
+      return 100;
     default:
-      return 0;
+      return 900;
   }
 }
 
@@ -165,8 +166,16 @@ int charToVisema(String C) {
       return 6;
     case "z":
       return 13;
+    case ".":
+    case ";":
+    case "-":
+    case "?":
+    case "!":
+    case ",":
+    case ":":
+      return 100;
     default:
-      return 0;
+      return 900;
   }
 }
 
